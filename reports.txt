@@ -1,0 +1,4 @@
+Good visibility in ambient light
+Automatic color generation function
+Auto detection of number of qr codes to decompress into - threshold
+Standardization of the color coding
