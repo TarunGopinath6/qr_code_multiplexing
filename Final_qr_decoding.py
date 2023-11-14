@@ -1,6 +1,7 @@
 import qrcode
 from PIL import Image
 
+
 def split_colors(input_string):
     output_list = []
     current_element = ""
@@ -24,7 +25,7 @@ multiplexed_qr_pixels = multiplexed_qr_img.load()
 width, height = multiplexed_qr_img.size
 
 color_list = {
-    (0,0,0): '000',
+    (0, 0, 0): '000',
     (0, 128, 0): '00255',
     (0, 0, 255): '02550',
     (0, 255, 255): '0255255',
@@ -46,9 +47,9 @@ for y in range(height):
     for x in range(width):
         pixel_array = multiplexed_qr_pixels[x, y]
         c1, c2, c3 = split_colors(color_list[pixel_array])
-        qr_code1_pixels[x,y] = (c1, c1, c1)
-        qr_code2_pixels[x,y] = (c2, c2, c2)
-        qr_code3_pixels[x,y] = (c3, c3, c3)
+        qr_code1_pixels[x, y] = (c1, c1, c1)
+        qr_code2_pixels[x, y] = (c2, c2, c2)
+        qr_code3_pixels[x, y] = (c3, c3, c3)
 
 # qr_img1.save("individual_qr_code1.png")
 # qr_img2.save("individual_qr_code2.png")

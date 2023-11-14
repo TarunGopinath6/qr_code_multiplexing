@@ -1,4 +1,10 @@
-Good visibility in ambient light
-Automatic color generation function
+Good visibility in ambient light - color bands
+Automatic color generation function - function bound by the bands
 Auto detection of number of qr codes to decompress into - threshold
-Standardization of the color coding
+
+First similar color pattern for universal
+Add noisy version of qr, smoothen, oversharpen
+
+f(n - number of qr requried): hex codes of 2^n colors. 
+
+Finder pattern optimization
