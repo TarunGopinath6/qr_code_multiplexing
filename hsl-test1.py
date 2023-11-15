@@ -1,59 +1,71 @@
-# import colorsys
+import math
 
 
-# def generate_distinct_colors(n):
-#     colors = []
-#     for i in range(2**n):
-#         hue = (i * 360.0) / (2**n)  # Distribute hues evenly
-#         saturation = 90.0  # You can adjust saturation and lightness as needed
-#         lightness = 50.0
-#         rgb = colorsys.hls_to_rgb(
-#             hue / 360.0, lightness / 100.0, saturation / 100.0)
-#         hex_color = "#{:02X}{:02X}{:02X}".format(
-#             int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
-#         colors.append(hex_color)
-#     return colors
+def color_distance(color1, color2):
+    # Convert hex color codes to RGB values
+    r1, g1, b1 = int(color1[1:3], 16), int(
+        color1[3:5], 16), int(color1[5:7], 16)
+    r2, g2, b2 = int(color2[1:3], 16), int(
+        color2[3:5], 16), int(color2[5:7], 16)
+
+    # Calculate Euclidean distance
+    distance = math.sqrt((r2 - r1)**2 + (g2 - g1)**2 + (b2 - b1)**2)
+
+    return distance
 
 
-# # Example usage for n=3
-# n = 3
-# result = generate_distinct_colors(n)
-# for i in result:
-#     print(i)
+def hsl_to_hex(h, s, l):
+    # Ensure h, s, and l are within valid ranges
+    h = max(0, min(360, h))
+    s = max(0, min(1, s))
+    l = max(0, min(1, l))
 
-import colorsys
+    # Formula to convert HSL to RGB
+    c = (1 - abs(2 * l - 1)) * s
+    x = c * (1 - abs((h / 60) % 2 - 1))
+    m = l - c / 2
 
+    if 0 <= h < 60:
+        r, g, b = c, x, 0
+    elif 60 <= h < 120:
+        r, g, b = x, c, 0
+    elif 120 <= h < 180:
+        r, g, b = 0, c, x
+    elif 180 <= h < 240:
+        r, g, b = 0, x, c
+    elif 240 <= h < 300:
+        r, g, b = x, 0, c
+    else:
+        r, g, b = c, 0, x
 
-def generate_colors(n):
-    if n < 0:
-        raise ValueError("n must be a non-negative integer.")
+    # Convert RGB to Hex
+    r = round((r + m) * 255)
+    g = round((g + m) * 255)
+    b = round((b + m) * 255)
 
-    colors = ["#FF0000"]  # Start with red
-
-    while len(colors) < 2**n:
-        # Get the last color in the array
-        last_color = colors[-1]
-
-        # Convert the last color to HSL
-        h, l, s = colorsys.rgb_to_hls(int(last_color[1:3], 16) / 255.0, int(
-            last_color[3:5], 16) / 255.0, int(last_color[5:7], 16) / 255.0)
-
-        # Increment the hue to get a perceptually different color
-        # Golden ratio is used to make the colors more visually appealing
-        h = (h + 0.618033988749895) % 1.0
-
-        # Convert the HSL back to RGB
-        r, g, b = colorsys.hls_to_rgb(h, l, s)
-
-        # Convert the RGB values to hex and add to the array
-        colors.append("#{:02X}{:02X}{:02X}".format(
-            int(r * 255), int(g * 255), int(b * 255)))
-
-    return colors
+    hex_code = "#{:02X}{:02X}{:02X}".format(r, g, b)
+    return hex_code
 
 
-# Example usage
-n = 4
-result = generate_colors(n)
-for i in result:
+n = 16
+color_list = []
+
+value = 360/n
+color_list = [x for x in range(int(value), 361, int(value))]
+hex_codes = []
+for i in color_list:
+    # hex_codes.append(hsl_to_hex(i, 0.5, 0.3))
+    hex_codes.append(hsl_to_hex(i, 1, 0.5))
+
+hex_color_distance = []
+for i in range(1, len(hex_codes)):
+    print(
+        f"{i-1} :   {round(color_distance((hex_codes[i-1]), hex_codes[i]), 1)}")
+
+for i in hex_codes:
     print(i)
+
+# generate 8 hex codes from color wheel
+# calculate distance between colors
+# count the number of outliers
+# divide them by n
