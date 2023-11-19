@@ -1,7 +1,25 @@
 import math
 import colorsys
+from itertools import product
+from math import sqrt, log2
+from PIL import Image
 
-from math import sqrt
+
+def hex_to_rgb(hex_code):
+    # Remove the '#' if present
+    hex_code = hex_code.lstrip('#')
+
+    # Convert the hex code to RGB
+    rgb = tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
+
+    return rgb
+
+
+def generate_bit_combinations(n):
+    combinations = list(product('01', repeat=n))
+    result = [''.join(bits) for bits in combinations]
+
+    return result
 
 
 def hex_to_lab(hex_color):
@@ -126,31 +144,15 @@ def hsl_to_hex(h, s, l):
     return hex_code
 
 
-n = 30
+k = 16
+n = k-2
 color_list = []
 
 value = 360/n
 color_list = [x for x in range(int(value), 361, int(value))]
 hex_codes = []
 for i in color_list:
-    # hex_codes.append(hsl_to_hex(i, 0.5, 0.3))
     hex_codes.append(hsl_to_hex(i, 1, 0.5))
-
-# for i in range(1, len(hex_codes)):
-#     dist = round(color_distance((hex_codes[i-1]), hex_codes[i]), 1)
-#     print(f"{i}: {dist}")
-#     if dist < 69:
-#         new_hsl = hsl_to_hex(color_list[i-1], 0.7, 0.5)
-#         hex_codes[i-1] = new_hsl
-#         i += 1
-
-# for i in range(1, len(hex_codes)):
-#     dist = round(color_distance((hex_codes[i-1]), hex_codes[i]), 1)
-#     print(f"{i}: {dist}")
-#     if dist < 33:
-#         new_hsl = hsl_to_hex(color_list[i-1], 0.5, 0.5)
-#         hex_codes[i-1] = new_hsl
-#         i += 1
 
 for i in range(1, len(hex_codes)):
     result = round(delta_e_cie76(hex_codes[i-1], hex_codes[i]), 1)
@@ -165,10 +167,44 @@ for i in range(1, len(hex_codes)):
         new_hsl = hsl_to_hex(color_list[i-1], 0.4, 0.5)
         hex_codes[i-1] = new_hsl
         i += 1
+hex_codes.append('#FFFFFF')
+hex_codes.append('#000000')
+hex_codes = sorted(hex_codes)
 
-# for i in range(1, len(hex_codes)):
-#     dist = round(color_distance(hex_codes[i-1], hex_codes[i]), 1)
-#     print(f"{i}: {dist}")
+bit_combinations = generate_bit_combinations(int(log2(k)))
+color_dict = {}
 
-for i in hex_codes:
-    print(i)
+for i in range(len(bit_combinations)):
+    color_dict[bit_combinations[i]] = hex_codes[i]
+
+for i in color_dict:
+    print(f"{i} :   {color_dict[i]}")
+    # print(f"{color_dict[i]}")
+
+qr_img1 = Image.open('./qr_code1.png')
+qr_img2 = Image.open('./qr_code2.png')
+qr_img3 = Image.open('./qr_code3.png')
+qr_img4 = Image.open('./qr_code3.png')
+
+qr_pixels1 = qr_img1.load()
+qr_pixels2 = qr_img2.load()
+qr_pixels3 = qr_img3.load()
+qr_pixels4 = qr_img4.load()
+width, height = qr_img1.size
+
+multiplexed_qr_img = Image.new("RGB", (width, height))
+multiplexed_qr_pixels = multiplexed_qr_img.load()
+
+bw_mapping = {255: 1, 0: 0}
+
+for y in range(height):
+    for x in range(width):
+        pixel_array = str(bw_mapping[qr_pixels1[x, y]]) + \
+            str(bw_mapping[qr_pixels2[x, y]]) + \
+            str(bw_mapping[qr_pixels3[x, y]]) + \
+            str(bw_mapping[qr_pixels4[x, y]])
+        color = color_dict[pixel_array]
+        multiplexed_qr_pixels[x, y] = hex_to_rgb(color)
+
+
+multiplexed_qr_img.save("multiplexed_qr_code.png")

@@ -6,18 +6,17 @@ data1 = "Alphanumeric Data 1"
 data2 = "Alphanumeric Data 2"
 data3 = "Alphanumeric Data 3"
 
-color_list = {
-    '000': (0, 0, 0),  # Black
-    '00255': (0, 128, 0),  # Red
-    '02550': (0, 0, 255),  # Blue
-    '0255255': (0, 255, 255),  # Cyan
-    '25500': (255, 0, 0),  # Green
-    '2550255': (255, 165, 0),  # Orange
-    '2552550': (255, 192, 203),  # Pink
-    '255255255': (255, 255, 255)  # White
-    # (255, 255, 0), # Yellow
-    # (128, 0, 128) # Purple
-}
+color_list = [
+    (255, 0, 0),  # Red
+    (0, 0, 255),  # Blue
+    (0, 0, 0),  # Black
+    (0, 128, 0),  # Green
+    (255, 165, 0),  # Orange
+    (255, 192, 203),  # Pink
+    (0, 255, 255),  # Cyan
+    (255, 255, 0),  # Yellow
+    (128, 0, 128)  # Purple
+]
 
 
 def generate_unique_rgb_color():
@@ -53,14 +52,31 @@ qr_pixels2 = qr_img2.load()
 qr_pixels3 = qr_img3.load()
 width, height = qr_img1.size
 
+color_table = {}
+
+for y in range(height):
+    for x in range(width):
+        pixel1 = qr_pixels1[x, y]
+        pixel2 = qr_pixels2[x, y]
+        pixel3 = qr_pixels3[x, y]
+        pixel_array = str(pixel1) + str(pixel2) + str(pixel3)
+        if pixel_array not in color_table:
+            if pixel_array == "255255255":
+                new_color = (255, 255, 255)
+            else:
+                new_color = generate_unique_rgb_color()
+            color_table[pixel_array] = new_color
+
+for i in color_table:
+    print(i, color_table[i])
+
 multiplexed_qr_img = Image.new("RGB", (width, height))
 multiplexed_qr_pixels = multiplexed_qr_img.load()
 for y in range(height):
     for x in range(width):
         pixel_array = str(qr_pixels1[x, y]) + \
             str(qr_pixels2[x, y]) + str(qr_pixels3[x, y])
-        print(pixel_array)
-        color = color_list.get(pixel_array)
+        color = color_table.get(pixel_array, (255, 255, 255))
         multiplexed_qr_pixels[x, y] = color
 
 multiplexed_qr_img.save("multiplexed_qr_code.png")
